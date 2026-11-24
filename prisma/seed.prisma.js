@@ -1,43 +1,40 @@
 const prisma = require("./prisma");
 
-const data = [
+const users = [
   {
-    id: 1,
     fname: "Jirayu",
     lname: "Suriwan",
-    email: "236002-adsmt@ap01.aisingroup.com",
+    email: "demo@example.com",
   },
   {
-    id: 2,
     fname: "Steven",
     lname: "Gerrard",
     email: "steven@liver.com",
   },
 ];
 
-console.log("Seeding...");
-(async () => {
-  try {
-    await Promise.all(
-      data.map((item) =>
-        prisma.user.upsert({
-          where: { email: item.email },
-          update: {},
-          create: {
-            fname: item.fname,
-            lname: item.lname,
-            email: item.email
-          }
-        }),
-      ),
-    );
+async function main() {
+  console.log("Seeding...");
 
-    console.log("Seed completed")
-  } catch (error) {
-    console.log(error.message)
-    console.log("Seed Error")
-    process.exit(1);
-  } finally {
+  await Promise.all(
+    users.map((user) =>
+      prisma.user.upsert({
+        where: { email: user.email },
+        update: {},
+        create: user,
+      }),
+    ),
+  );
+
+  console.log("Seed completed");
+}
+
+main()
+  .catch((error) => {
+    console.error(error.message);
+    console.error("Seed Error");
+    process.exitCode = 1;
+  })
+  .finally(async () => {
     await prisma.$disconnect();
-  }
-})();
+  });
